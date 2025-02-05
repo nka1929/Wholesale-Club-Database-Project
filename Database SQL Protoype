@@ -1,0 +1,444 @@
+-- 1 only creates tables since OR ALTER does not seem to work
+ CREATE TABLE MembershipTier (
+    MembershipTierID INT PRIMARY KEY,
+    Price DECIMAL(10, 2),
+    Benefits NVARCHAR(255)
+ );
+ CREATE TABLE Customer (
+    CustomerID INT PRIMARY KEY,
+    FirstName NVARCHAR(50) ,
+    LastName NVARCHAR(50) ,
+    MembershipTierID INT,
+    ZipCode NVARCHAR(10),
+    SubscriptionDate DATETIME 
+);
+ CREATE TABLE DeliveryCenter (
+    DeliveryCenterID INT PRIMARY KEY,
+    Address NVARCHAR(255) ,
+    LocationID INT
+ );
+ CREATE TABLE Overhead (
+    OverheadID INT PRIMARY KEY,
+    WeeklyUtilities DECIMAL(10, 2),
+    WeeklySalary DECIMAL(10, 2),
+    WeeklyRent DECIMAL(10, 2),
+    LocationID INT
+ );
+ CREATE TABLE Contract (
+    ContractID INT PRIMARY KEY,
+    SignDate DATETIME ,
+    ExpirationDate DATETIME ,
+    Price DECIMAL(10, 2),
+    LocationID INT,
+    LesseeID INT,
+    ContractLength INT,
+    SpaceDetails NVARCHAR(255) 
+);
+ CREATE TABLE Lessee (
+    LesseeID INT PRIMARY KEY,
+    Name NVARCHAR(100),
+    Email NVARCHAR(100),
+    ContractID INT
+ );
+ CREATE TABLE Location (
+    LocationID INT PRIMARY KEY,
+    Address NVARCHAR(255),
+    OverheadID INT,
+    DeliveryCenterID INT,
+    ContractID INT
+ );
+ CREATE TABLE Supplier (
+    SupplierID INT PRIMARY KEY,
+    CompanyName NVARCHAR(100),
+    Address NVARCHAR(255),
+    Email NVARCHAR(100),
+    PhoneNumber NVARCHAR(15),
+    LocationID INT
+ );
+ CREATE TABLE Stock (
+    ItemID INT PRIMARY KEY,
+    ItemName NVARCHAR(100),
+    Price DECIMAL(10, 2),
+    SupplierID INT,
+    LocationID INT
+ );
+ CREATE TABLE Employee (
+    EmployeeID INT PRIMARY KEY,
+    FirstName NVARCHAR(50),
+    LastName NVARCHAR(50),
+    Position NVARCHAR(50),
+    Salary DECIMAL(10, 2),
+    LocationID INT,
+    DeliveryCenterID INT
+ );
+ CREATE TABLE DeliveryOrder (
+    DeliveryOrderID INT PRIMARY KEY,
+    ShippingCost DECIMAL(10, 2),
+);
+    DeliveryDate DATETIME,
+    TotalPrice DECIMAL(10, 2),
+    ItemID INT,
+    DeliveryCenterID INT
+ CREATE TABLE [Transaction] (
+    TransactionID INT PRIMARY KEY,
+    TotalPrice DECIMAL(10, 2),
+    OrderDate DATETIME,
+    CustomerID INT,
+    EmployeeID INT,
+    ItemID INT,
+    LocationID INT,
+    DeliveryOrderID INT
+ );--2 adds foreign keys to tables
+ ALTER TABLE Customer
+ ADD CONSTRAINT FK_Customer_MembershipTier
+ FOREIGN KEY (MembershipTierID) REFERENCES MembershipTier(MembershipTierID);
+ ALTER TABLE DeliveryCenter
+ ADD CONSTRAINT FK_DeliveryCenter_Location
+ FOREIGN KEY (LocationID) REFERENCES Location(LocationID);
+ ALTER TABLE Overhead
+ ADD CONSTRAINT FK_Overhead_Location
+ FOREIGN KEY (LocationID) REFERENCES Location(LocationID);
+ ALTER TABLE Contract
+ ADD CONSTRAINT FK_Contract_Location
+ FOREIGN KEY (LocationID) REFERENCES Location(LocationID);
+ ALTER TABLE Contract
+ ADD CONSTRAINT FK_Contract_Lessee
+ FOREIGN KEY (LesseeID) REFERENCES Lessee(LesseeID);
+ ALTER TABLE Lessee
+ ADD CONSTRAINT FK_Lessee_Contract
+ FOREIGN KEY (ContractID) REFERENCES Contract(ContractID);
+ ALTER TABLE Location
+ ADD CONSTRAINT FK_Location_Overhead
+ FOREIGN KEY (OverheadID) REFERENCES Overhead(OverheadID);
+ ALTER TABLE Location
+ ADD CONSTRAINT FK_Location_DeliveryCenter
+ FOREIGN KEY (DeliveryCenterID) REFERENCES DeliveryCenter(DeliveryCenterID);
+ ALTER TABLE Location
+ ADD CONSTRAINT FK_Location_Contract
+ FOREIGN KEY (ContractID) REFERENCES Contract(ContractID);
+ ALTER TABLE Supplier
+ ADD CONSTRAINT FK_Supplier_Location
+ FOREIGN KEY (LocationID) REFERENCES Location(LocationID);
+ ALTER TABLE Stock
+ ADD CONSTRAINT FK_Stock_Supplier
+ FOREIGN KEY (SupplierID) REFERENCES Supplier(SupplierID);
+ ALTER TABLE Stock
+ ADD CONSTRAINT FK_Stock_Location
+ FOREIGN KEY (LocationID) REFERENCES Location(LocationID);
+ ALTER TABLE Employee
+ ADD CONSTRAINT FK_Employee_Location
+ FOREIGN KEY (LocationID) REFERENCES Location(LocationID);
+ ALTER TABLE Employee
+ ADD CONSTRAINT FK_Employee_DeliveryCenter
+ FOREIGN KEY (DeliveryCenterID) REFERENCES DeliveryCenter(DeliveryCenterID);
+ ALTER TABLE DeliveryOrder
+ ADD CONSTRAINT FK_DeliveryOrder_Stock
+ FOREIGN KEY (ItemID) REFERENCES Stock(ItemID);
+ ALTER TABLE DeliveryOrder
+ ADD CONSTRAINT FK_DeliveryOrder_DeliveryCenter
+ FOREIGN KEY (DeliveryCenterID) REFERENCES DeliveryCenter(DeliveryCenterID);
+ ALTER TABLE [Transaction]
+ ADD CONSTRAINT FK_Transaction_Customer
+ FOREIGN KEY (CustomerID) REFERENCES Customer(CustomerID);
+ALTER TABLE [Transaction]
+ ADD CONSTRAINT FK_Transaction_Employee
+ FOREIGN KEY (EmployeeID) REFERENCES Employee(EmployeeID);
+ ALTER TABLE [Transaction]
+ ADD CONSTRAINT FK_Transaction_Stock
+ FOREIGN KEY (ItemID) REFERENCES Stock(ItemID);
+ ALTER TABLE [Transaction]
+ ADD CONSTRAINT FK_Transaction_Location
+ FOREIGN KEY (LocationID) REFERENCES Location(LocationID);
+ ALTER TABLE [Transaction]
+ ADD CONSTRAINT FK_Transaction_DeliveryOrder
+ FOREIGN KEY (DeliveryOrderID) REFERENCES DeliveryOrder(DeliveryOrderID);--used to delete tables so create commands work again
+ DROP TABLE IF EXISTS [Transaction];
+ DROP TABLE IF EXISTS DeliveryOrder;
+ DROP TABLE IF EXISTS Employee;
+ DROP TABLE IF EXISTS Stock;
+ DROP TABLE IF EXISTS Supplier;
+ DROP TABLE IF EXISTS Location;
+ DROP TABLE IF EXISTS Lessee;
+ DROP TABLE IF EXISTS Contract;
+ DROP TABLE IF EXISTS Overhead;
+ DROP TABLE IF EXISTS DeliveryCenter;
+ DROP TABLE IF EXISTS Customer;
+ DROP TABLE IF EXISTS MembershipTier;--removes foreign keys to allow drops
+ ALTER TABLE Customer
+ DROP CONSTRAINT FK_Customer_MembershipTier;
+ ALTER TABLE DeliveryCenter
+ DROP CONSTRAINT FK_DeliveryCenter_Location;
+ ALTER TABLE Overhead
+ DROP CONSTRAINT FK_Overhead_Location;
+ ALTER TABLE Contract
+ DROP CONSTRAINT FK_Contract_Location;
+ ALTER TABLE Contract
+ DROP CONSTRAINT FK_Contract_Lessee;
+ ALTER TABLE Lessee
+ DROP CONSTRAINT FK_Lessee_Contract;
+ ALTER TABLE Location
+ DROP CONSTRAINT FK_Location_Overhead;
+ ALTER TABLE Location
+ DROP CONSTRAINT FK_Location_DeliveryCenter;
+ ALTER TABLE Location
+ DROP CONSTRAINT FK_Location_Contract;
+ ALTER TABLE Supplier
+ DROP CONSTRAINT FK_Supplier_Location;
+ ALTER TABLE Stock
+ DROP CONSTRAINT FK_Stock_Supplier;
+ ALTER TABLE Stock
+ DROP CONSTRAINT FK_Stock_Location;
+ ALTER TABLE Employee
+ DROP CONSTRAINT FK_Employee_Location;
+ ALTER TABLE Employee
+ DROP CONSTRAINT FK_Employee_DeliveryCenter;
+ ALTER TABLE DeliveryOrder
+ DROP CONSTRAINT FK_DeliveryOrder_Stock;
+ ALTER TABLE DeliveryOrder
+ DROP CONSTRAINT FK_DeliveryOrder_DeliveryCenter;
+ ALTER TABLE [Transaction]
+ DROP CONSTRAINT FK_Transaction_Customer;
+ ALTER TABLE [Transaction]
+ DROP CONSTRAINT FK_Transaction_Employee;
+ ALTER TABLE [Transaction]
+ DROP CONSTRAINT FK_Transaction_Stock;
+ALTER TABLE [Transaction]
+ DROP CONSTRAINT FK_Transaction_Location;
+ ALTER TABLE [Transaction]
+ DROP CONSTRAINT FK_Transaction_DeliveryOrder;-- 3 creates example data for each table: MembershipTier-- MembershipTier (unchanged)
+ INSERT INTO MembershipTier (MembershipTierID, Price, Benefits)
+ VALUES
+ (1, 10.99, 'Basic benefits'),
+ (2, 19.99, 'Standard benefits'),
+ (3, 29.99, 'Premium benefits'),
+ (4, 39.99, 'VIP benefits'),
+ (5, 5.99, 'Trial benefits');-- Customer
+ INSERT INTO Customer (CustomerID, FirstName, LastName, MembershipTierID, ZipCode, SubscriptionDate)
+ VALUES
+ (1, 'John', 'Doe', 1, '12345', '2023-01-15'),
+ (2, 'Jane', 'Smith', 2, '67890', '2023-03-10'),
+ (3, 'Alice', 'Johnson', 3, '54321', '2023-06-05'),
+ (4, 'Michael', 'Brown', 4, '98765', '2023-05-20'),
+ (5, 'Sophia', 'Williams', 5, '54321', '2023-04-25'),
+ (6, 'William', 'Taylor', 2, '34567', '2023-07-15'),
+ (7, 'Emma', 'Davis', 3, '98765', '2023-02-05'),
+ (8, 'David', 'Clark', 1, '12345', '2023-06-30'),
+ (9, 'Olivia', 'Martinez', 4, '67890', '2023-09-10'),
+ (10, 'Liam', 'Garcia', 5, '54321', '2023-08-15');-- Location
+ INSERT INTO Location (LocationID, Address, OverheadID, DeliveryCenterID, ContractID)
+ VALUES
+ (1, '1001 Market St', NULL, NULL, NULL),
+ (2, '2002 Industrial Ave', NULL, NULL, NULL),
+ (3, '3003 Commerce Blvd', NULL, NULL, NULL),
+ (4, '4004 Innovation Way', NULL, NULL, NULL),
+ (5, '5005 Tech Lane', NULL, NULL, NULL),
+ (6, '6006 Industrial Park', NULL, NULL, NULL),
+ (7, '7007 Downtown Blvd', NULL, NULL, NULL),
+ (8, '8008 Commerce Way', NULL, NULL, NULL),
+ (9, '9009 Retail Row', NULL, NULL, NULL),
+ (10, '1010 Tech Valley', NULL, NULL, NULL);-- Overhead
+ INSERT INTO Overhead (OverheadID, WeeklyUtilities, WeeklySalary, WeeklyRent, LocationID)
+ VALUES
+ (1, 500.00, 2000.00, 1500.00, 1),
+ (2, 400.00, 1800.00, 1400.00, 2),
+ (3, 600.00, 2200.00, 1600.00, 3),
+ (4, 450.00, 1900.00, 1450.00, 4),
+ (5, 550.00, 2300.00, 1550.00, 5),
+ (6, 650.00, 2400.00, 1650.00, 6),
+ (7, 475.00, 1950.00, 1475.00, 7),
+ (8, 580.00, 2250.00, 1580.00, 8),
+ (9, 610.00, 2350.00, 1610.00, 9),
+ (10, 700.00, 2600.00, 1700.00, 10);-- DeliveryCenter
+ INSERT INTO DeliveryCenter (DeliveryCenterID, Address, LocationID)
+ VALUES
+ (1, '123 Main St', 1),
+ (2, '456 Elm St', 2),
+ (3, '789 Oak St', 3),
+ (4, '321 Pine St', 4),
+ (5, '654 Maple St', 5),
+ (6, '987 Birch Ln', 6),
+ (7, '222 Willow Dr', 7),
+ (8, '333 Ash Ct', 8),
+ (9, '444 Cedar Ave', 9),
+ (10, '555 Spruce Rd', 10);-- Contract
+ INSERT INTO Contract (ContractID, SignDate, ExpirationDate, Price, LocationID, LesseeID, ContractLength, SpaceDetails)
+ VALUES
+ (1, '2023-01-01', '2023-12-31', 5000.00, 1, NULL, 365, 'Office Space A'),
+ (2, '2023-03-01', '2023-09-30', 3000.00, 2, NULL, 210, 'Warehouse B'),
+ (3, '2023-06-01', '2024-05-31', 6000.00, 3, NULL, 365, 'Retail Space C'),
+ (4, '2023-04-01', '2023-12-15', 4000.00, 4, NULL, 259, 'Studio D'),
+ (5, '2023-02-15', '2023-11-15', 4500.00, 5, NULL, 273, 'Workshop E'),
+ (6, '2023-05-01', '2024-04-30', 5200.00, 6, NULL, 365, 'Tech Hub F'),
+ (7, '2023-07-01', '2024-06-30', 3100.00, 7, NULL, 365, 'Retail Space G'),
+ (8, '2023-08-01', '2024-07-31', 4600.00, 8, NULL, 365, 'Office Suite H'),
+ (9, '2023-09-01', '2024-08-31', 4900.00, 9, NULL, 365, 'Warehouse I'),
+ (10, '2023-10-01', '2024-09-30', 5300.00, 10, NULL, 365, 'Workshop J');
+-- Lessee
+ INSERT INTO Lessee (LesseeID, Name, Email, ContractID)
+ VALUES
+ (1, 'Global Corp', 'contact@globalcorp.com', 1),
+ (2, 'Tech Solutions', 'info@techsolutions.com', 2),
+ (3, 'Retail Partners', 'hello@retailpartners.com', 3),
+ (4, 'Creative Studios', 'studio@creative.com', 4),
+ (5, 'Builders Inc', 'info@builders.com', 5),
+ (6, 'Logistics Ltd', 'logistics@company.com', 6),
+ (7, 'Green Energy Co', 'energy@greenenergy.com', 7),
+ (8, 'Auto Services', 'auto@services.com', 8),
+ (9, 'Cloud Tech', 'support@cloudtech.com', 9),
+ (10, 'Metro Retail', 'contact@metroretail.com', 10);-- Supplier
+ INSERT INTO Supplier (SupplierID, CompanyName, Address, Email, PhoneNumber, LocationID)
+ VALUES
+ (1, 'Fresh Produce Co', '123 Green Way', 'info@freshproduce.com', '555-1234', 1),
+ (2, 'Tech Gadgets Inc', '456 Tech Park', 'support@techgadgets.com', '555-5678', 2),
+ (3, 'Retail Supplies Ltd', '789 Retail Rd', 'contact@retailsupplies.com', '555-9012', 3),
+ (4, 'Office World', '321 Office Plaza', 'contact@officeworld.com', '555-3456', 4),
+ (5, 'Fashion Hub', '654 Style Ave', 'info@fashionhub.com', '555-7890', 5),
+ (6, 'Industrial Co', '222 Factory Ln', 'sales@industrial.com', '555-1122', 6),
+ (7, 'Warehouse Supply', '333 Depot Rd', 'orders@warehousesupply.com', '555-2233', 7),
+ (8, 'Tech Innovators', '444 Silicon Blvd', 'info@techinnovators.com', '555-3344', 8),
+ (9, 'Green Goods', '555 Eco Dr', 'support@greengoods.com', '555-4455', 9),
+ (10, 'Global Retailers', '666 Market Ave', 'contact@globalretailers.com', '555-5566', 10);-- Stock
+ INSERT INTO Stock (ItemID, ItemName, Price, SupplierID, LocationID)
+ VALUES
+ (1, 'Laptops', 999.99, 2, 2),
+ (2, 'Chairs', 49.99, 3, 3),
+ (3, 'Fruits', 2.99, 1, 1),
+ (4, 'Desks', 149.99, 4, 4),
+ (5, 'Shirts', 19.99, 5, 5),
+ (6, 'Monitors', 199.99, 6, 6),
+ (7, 'Keyboards', 29.99, 7, 7),
+ (8, 'Phones', 499.99, 8, 8),
+ (9, 'Printers', 299.99, 9, 9),
+ (10, 'Headphones', 89.99, 10, 10);-- Employee
+ INSERT INTO Employee (EmployeeID, FirstName, LastName, Position, Salary, LocationID, DeliveryCenterID)
+ VALUES
+ (1, 'Chris', 'Brown', 'Manager', 55000.00, 1, 1),
+ (2, 'Taylor', 'Green', 'Driver', 30000.00, 2, 2),
+ (3, 'Jordan', 'White', 'Clerk', 25000.00, 3, 3),
+ (4, 'Alex', 'Black', 'Technician', 40000.00, 4, 4),
+ (5, 'Morgan', 'Gray', 'Coordinator', 35000.00, 5, 5),
+ (6, 'Emily', 'Blue', 'Assistant', 32000.00, 6, 6),
+ (7, 'Daniel', 'Cyan', 'Supervisor', 45000.00, 7, 7),
+ (8, 'Olivia', 'Violet', 'Operator', 37000.00, 8, 8),
+ (9, 'Noah', 'Silver', 'Specialist', 42000.00, 9, 9),
+ (10, 'Sophia', 'Gold', 'Consultant', 47000.00, 10, 10);-- DeliveryOrder
+ INSERT INTO DeliveryOrder (DeliveryOrderID, ShippingCost, DeliveryDate, TotalPrice, ItemID, DeliveryCenterID)
+ VALUES
+ (1, 20.00, '2023-08-10', 200.00, 1, 1),
+ (2, 15.00, '2023-08-11', 150.00, 2, 2),
+ (3, 25.00, '2023-08-12', 250.00, 3, 3),
+ (4, 30.00, '2023-08-13', 300.00, 4, 4),
+ (5, 10.00, '2023-08-14', 100.00, 5, 5),
+ (6, 40.00, '2023-08-15', 350.00, 6, 6),
+ (7, 35.00, '2023-08-16', 275.00, 7, 7),
+ (8, 50.00, '2023-08-17', 500.00, 8, 8),
+ (9, 20.00, '2023-08-18', 220.00, 9, 9),
+ (10, 45.00, '2023-08-19', 400.00, 10, 10);-- Transaction
+ INSERT INTO [Transaction] (TransactionID, TotalPrice, OrderDate, CustomerID, EmployeeID, ItemID, LocationID, DeliveryOrderID)
+ VALUES
+ (1, 500.00, '2023-08-01', 1, 1, 1, 1, 1),
+ (2, 300.00, '2023-08-02', 2, 2, 2, 2, 2),
+ (3, 700.00, '2023-08-03', 3, 3, 3, 3, 3),
+ (4, 400.00, '2023-08-04', 4, 4, 4, 4, 4),
+ (5, 200.00, '2023-08-05', 5, 5, 5, 5, 5),
+ (6, 600.00, '2023-08-06', 6, 6, 6, 6, 6),
+ (7, 800.00, '2023-08-07', 7, 7, 7, 7, 7),
+ (8, 1000.00, '2023-08-08', 8, 8, 8, 8, 8),
+ (9, 550.00, '2023-08-09', 9, 9, 9, 9, 9),
+ (10, 450.00, '2023-08-10', 10, 10, 10, 10, 10);-- 4 adds deliverys that are not completed that the view can use
+ INSERT INTO DeliveryOrder (DeliveryOrderID, ShippingCost, DeliveryDate, TotalPrice, ItemID, DeliveryCenterID)
+ VALUES
+(11, 25.00, DATEADD(DAY, 5, GETDATE()), 300.00, 1, 1), -- Delivery in 5 days
+ (12, 15.00, DATEADD(DAY, 10, GETDATE()), 150.00, 2, 2); -- Delivery in 10 days
+ INSERT INTO [Transaction] (TransactionID, TotalPrice, OrderDate, CustomerID, EmployeeID, ItemID, LocationID, DeliveryOrderID)
+ VALUES
+ (11, 300.00, GETDATE(), 1, 1, 1, 1, 11), -- Matches DeliveryOrderID 11
+ (12, 150.00, GETDATE(), 2, 2, 2, 2, 12); -- Matches DeliveryOrderID 12--5 fixes the lessee IDs in contract
+ UPDATE Contract
+ SET LesseeID = 1
+ WHERE ContractID = 1;
+ UPDATE Contract
+ SET LesseeID = 2
+ WHERE ContractID = 2;
+ UPDATE Contract
+ SET LesseeID = 3
+ WHERE ContractID = 3;
+ UPDATE Contract
+ SET LesseeID = 4
+ WHERE ContractID = 4;
+ UPDATE Contract
+ SET LesseeID = 5
+ WHERE ContractID = 5;
+ UPDATE Contract
+ SET LesseeID = 6
+ WHERE ContractID = 6;
+ UPDATE Contract
+ SET LesseeID = 7
+ WHERE ContractID = 7;
+ UPDATE Contract
+ SET LesseeID = 8
+ WHERE ContractID = 8;
+ UPDATE Contract
+ SET LesseeID = 9
+ WHERE ContractID = 9;
+ UPDATE Contract
+ SET LesseeID = 10
+ WHERE ContractID = 10;--6 Creates the view that contains delivery orders that are not yet delivered
+ CREATE VIEW vw_Active_Delivery_Orders AS
+ SELECT DeliveryOrder.*,[Transaction].OrderDate,[Transaction].TransactionID,[Transaction].CustomerID
+ FROM DeliveryOrder
+ JOIN [Transaction] ON DeliveryOrder.DeliveryOrderID = [Transaction].DeliveryOrderID
+ WHERE DeliveryOrder.DeliveryDate > GETDATE();-- 7 creates the procedure
+ CREATE PROCEDURE GetEndingContracts @locationID INT = NULL, @spaceDetails NVARCHAR(255) = NULL, @days INT AS
+ BEGIN
+ SELECT Contract.ContractID,Contract.SignDate,Contract.ExpirationDate,Contract.Price,Contract.ContractLength,Contract.LocationID,Contract.
+ LesseeID,Contract.SpaceDetails,Lessee.Name AS LesseeName,Location.Address,
+ CASE
+ WHEN Contract.ContractLength <= 180 THEN 'Short'
+ WHEN Contract.ContractLength BETWEEN 181 AND 364 THEN 'Medium'
+ ELSE 'Long'
+ END AS ContractCategory
+ FROM Contract
+ JOIN Lessee ON Contract.LesseeID = Lessee.LesseeID
+ JOIN Location ON Contract.LocationID = Location.LocationID
+ WHERE (Contract.LocationID = @locationID OR @locationID IS NULL) AND
+ (Contract.SpaceDetails = @spaceDetails OR @spaceDetails IS NULL) AND
+ DATEDIFF(DAY, GETDATE(), Contract.ExpirationDate) <= @days
+ ORDER BY Contract.ExpirationDate ASC;
+ END;--shows the view table (active deliveries)
+ SELECT * FROM vw_Active_Delivery_Orders;--shows the biggest currently active delivery order
+ SELECT TOP 1 DeliveryOrderID, TotalPrice
+ FROM vw_Active_Delivery_Orders
+ ORDER BY TotalPrice DESC;
+--shows the oldest delivery order that is currently active
+ SELECT TOP 1 DeliveryOrderID, DeliveryDate, OrderDate
+ FROM vw_Active_Delivery_Orders
+ ORDER BY OrderDate DESC;--shows the most common items in active delivery orders
+ SELECT Stock.ItemName, COUNT(vw_Active_Delivery_Orders.ItemID) AS ItemCount
+ FROM vw_Active_Delivery_Orders
+ JOIN Stock ON vw_Active_Delivery_Orders.ItemID = Stock.ItemID
+ GROUP BY Stock.ItemName
+ ORDER BY ItemCount DESC;--shows how many active delivery orders there are
+ SELECT COUNT(DeliveryOrderID) AS DeliveryOrderCount
+ FROM vw_Active_Delivery_Orders;--shows all the contracts ending within 300 days
+ EXEC GetEndingContracts @locationID = NULL, @spaceDetails = NULL, @days = 300;
+ SELECT *
+ FROM Contract;--shows any contract thats for location 1 and ends in a year or less
+ EXEC GetEndingContracts @locationID = 1, @spaceDetails = NULL, @days = 365;-- Customers Who Use the Delivery Service the Most Frequently
+ SELECT [Transaction].CustomerID, Customer.FirstName, Customer.LastName, COUNT(DeliveryOrder.DeliveryOrderID) AS DeliveryCount
+ FROM [Transaction]
+ LEFT JOIN DeliveryOrder ON [Transaction].DeliveryOrderID = DeliveryOrder.DeliveryOrderID
+ LEFT JOIN Customer ON [Transaction].CustomerID = Customer.CustomerID
+ GROUP BY [Transaction].CustomerID, Customer.FirstName, Customer.LastName
+ ORDER BY DeliveryCount DESC;--zip code Where the Delivery Service is Used the Most
+ SELECT Customer.ZipCode, COUNT([Transaction].DeliveryOrderID) AS DeliveryCount
+ FROM Customer
+ LEFT JOIN [Transaction] ON [Transaction].CustomerID = Customer.CustomerID
+ GROUP BY Customer.ZipCode
+ ORDER BY DeliveryCount DESC;
+ SELECT *
+ FROM Location;--Delivery Orders with Contracts where the contract is over $4000
+ SELECT DeliveryOrder.DeliveryOrderID, Contract.ContractID,Contract.SignDate, Contract.ExpirationDate, contract.price
+ FROM DeliveryOrder
+ JOIN Contract ON DeliveryOrder.DeliveryOrderID = Contract.ContractID
+ WHERE Contract.price > 4000;
