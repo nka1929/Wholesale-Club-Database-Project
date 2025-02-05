@@ -7,3 +7,8 @@ This project aims to centralize key business operations such as inventory tracki
 - Google Docs (Report Building)
 - Lucidchart (ERD Diagram)
 
+# Key Skills
+- Providing insights through in depth analysis
+- Answering key business questions
+- Providing actionable recommendations
+
