@@ -4,8 +4,7 @@ This project aims to centralize key business operations such as inventory tracki
 # Tools Used
 - SQL Server
 - Power BI
-- Google Docs (Report Building)
-- Lucidchart (ERD Diagram)
+- Google Docs (Report Building and ERD Diagram)
 
 # Key Skills
 - Providing insights through in depth analysis
